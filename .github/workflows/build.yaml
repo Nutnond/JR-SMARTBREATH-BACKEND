@@ -17,7 +17,7 @@ jobs:
 
     env:
       # ระบุชื่อรูปบน Docker Hub: docker.io/<username>/jr-smartbreath
-      IMAGE: docker.io/${{ secrets.DOCKERHUB_USERNAME }}/jr-smartbreath
+      IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/jr-smartbreath
 
     steps:
       - name: Checkout
@@ -68,7 +68,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./Dockerfile
+          file: ./CI/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}      # ใช้แท็กจาก metadata-action

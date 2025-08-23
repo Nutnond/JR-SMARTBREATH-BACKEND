@@ -1,29 +1,23 @@
-name: CI Build & Push to Docker Hub
+name: Build & Push Docker Image (Node)
 
 on:
   push:
-    branches: ["master"]
-    tags:
-      - "v*.*.*"      # push tag เวอร์ชัน (เช่น v1.2.3)
-  pull_request:
-    branches: ["master"]
+    branches:
+      - master
 
-permissions:
-  contents: read
+env:
+  DOCKER_IMAGE: docker.io/${{ secrets.DOCKER_USERNAME }}/jr-smartbreath   # ชื่อรูปบน Docker Hub
+  NODE_ENV: production
 
 jobs:
-  build-and-push:
+  build:
     runs-on: ubuntu-latest
 
-    env:
-      # ระบุชื่อรูปบน Docker Hub: docker.io/<username>/jr-smartbreath
-      IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/jr-smartbreath
-
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # (ออปชัน) ติดตั้ง/รันทดสอบ ก่อน build
+      # (ออปชัน) รัน test ของ Node ก่อน build
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -33,45 +27,37 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      - name: Run tests (skip if no test script)
+      - name: Run tests (skip if no script)
         run: |
-          node -e "const p=require('./package.json');process.exit(p.scripts && p.scripts.test ? 0 : 0)"
-          if npm run -s | grep -q '^  test'; then npm test; else echo "No test script. Skipping."; fi
+          if npm run -s | grep -q '^  test'; then
+            npm test
+          else
+            echo "No test script. Skipping."
+          fi
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # สร้าง tags/labels อัตโนมัติ
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.IMAGE }}
-          tags: |
-            type=raw,value=latest,enable={{is_default_branch}}  # :latest บนสาขาเริ่มต้น (master)
-            type=ref,event=branch                               # :ชื่อสาขา (เช่น :master, :feature-x)
-            type=sha,format=long                                # :sha-<commit>
-            type=ref,event=tag                                  # :v1.2.3 เมื่อ push git tag
-          flavor: |
-            latest=auto
-            prefix=
-            suffix=
-
-      # Build & Push แบบ multi-arch
-      - name: Build and Push
+      # Build single-arch และโหลดเข้า local daemon
+      - name: Build Docker Image (load to local)
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./CI/Dockerfile
-          platforms: linux/amd64,linux/arm64
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}      # ใช้แท็กจาก metadata-action
-          labels: ${{ steps.meta.outputs.labels }}
+          file: ./CI/Dockerfile          # ปรับตามที่เก็บ Dockerfile (เช่น CI/Dockerfile)
+          push: false                 # ยังไม่ push ตอนนี้
+          load: true                  # สำคัญ: โหลดเข้า docker daemon สำหรับขั้นตอน push ถัดไป
+          tags: ${{ env.DOCKER_IMAGE }}:latest
+          build-args: |
+            NODE_ENV=${{ env.NODE_ENV }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Push Docker Image(s)
+        run: |
+          docker push ${{ env.DOCKER_IMAGE }}:latest

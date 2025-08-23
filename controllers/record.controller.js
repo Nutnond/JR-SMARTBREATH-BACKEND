@@ -34,34 +34,43 @@ exports.create = async (req, res) => {
 exports.findAll = async (req, res) => {
   try {
     const { machineId } = req.query;
-
-    // 2. ตรวจสอบว่ามีการส่ง machineId มาหรือไม่
     if (!machineId) {
       return res.status(400).send({ message: "Query parameter 'machineId' is required." });
     }
 
-    // 3. ดึงข้อมูลเครื่องเพื่อตรวจสอบความเป็นเจ้าของ
+    // ตรวจสอบเครื่อง + สิทธิ์เจ้าของ
     const machine = await machineService.getMachineById(machineId);
-    
-    if (!machine) {
-        return res.status(404).send({ message: "Machine not found." });
-    }
-
-    // 4. --- 🔐 ตรวจสอบสิทธิ์ ---
-    // เช็คว่าผู้ใช้ที่ login เป็นเจ้าของเครื่องนี้หรือไม่
+    if (!machine) return res.status(404).send({ message: "Machine not found." });
     if (machine.ownerId !== req.userId) {
-        return res.status(403).send({ message: "Forbidden: You can only view records for your own machines." });
+      return res.status(403).send({ message: "Forbidden: You can only view records for your own machines." });
     }
-    // --- สิ้นสุดการตรวจสอบ ---
 
-    // 5. ถ้าเป็นเจ้าของจริง จึงดึงข้อมูล Record
-    const records = await recordService.getAllRecords(machineId);
-    res.send(records);
+    // ---- Pagination & Filters ----
+    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    const pageSizeRaw = parseInt(req.query.pageSize, 10) || 10;
+    const pageSize = Math.min(Math.max(pageSizeRaw, 1), 100); // กันยิงหนักเกิน
 
+    const allowedSort = new Set(['timestamp', 'spo2', 'fev1', 'fvc', 'pef', 'fev1_fvc', 'id']);
+    const sortBy = allowedSort.has(req.query.sortBy) ? req.query.sortBy : 'timestamp';
+    const order = (req.query.order || 'desc').toLowerCase() === 'asc' ? 'asc' : 'desc';
+
+    // กรองช่วงเวลา (ถ้ามี) รองรับ ISO string หรือ yyyy-MM-dd
+    const from = req.query.from ? new Date(req.query.from) : null;
+    const to = req.query.to ? new Date(req.query.to) : null;
+
+    // เรียก service แบบแบ่งหน้า
+    const result = await recordService.getRecordsPaginated(machineId, {
+      page,
+      pageSize,
+      sortBy,
+      order,
+      from,
+      to,
+    });
+
+    res.send(result);
   } catch (error) {
-    handleErrors(res, error); // สมมติว่ามีฟังก์ชัน handleErrors อยู่
+    handleErrors(res, error);
   }
 };
 
-// findOne, update, delete สามารถทำในลักษณะเดียวกัน
-// ...

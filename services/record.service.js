@@ -41,17 +41,38 @@ const createRecord = async (recordData) => {
 /**
  * ดึง Record ทั้งหมด โดยอาจกรองตาม machineId
  */
-const getAllRecords = async (machineId) => {
-    const condition = machineId ? { machine_id: machineId } : null;
-    return await Record.findAll({
-        where: condition,
-        order: [['measured_at', 'DESC']], // เรียงตามวันที่วัดล่าสุด
-        include: [{ // ดึงข้อมูลเครื่องมาด้วย
-            model: Machine,
-            as: 'machine',
-            attributes: ['id', 'device_name']
-        }]
-    });
+ const getRecordsPaginated = async (machineId, { page, pageSize, sortBy, order, from, to }) => {
+  const offset = (page - 1) * pageSize;
+
+  // เงื่อนไข where
+  const where = { machineId };
+
+  // กรองช่วงเวลา
+  if (from || to) {
+    where.timestamp = {};
+    if (from) where.timestamp[Op.gte] = from;
+    if (to) where.timestamp[Op.lte] = to;
+  }
+
+  const { rows, count } = await Record.findAndCountAll({
+    where,
+    offset,
+    limit: pageSize,
+    order: [[sortBy, order.toUpperCase()]],
+  });
+
+  const totalCount = count;
+  const totalPages = Math.max(Math.ceil(totalCount / pageSize), 1);
+
+  return {
+    page,
+    pageSize,
+    totalPages,
+    totalCount,
+    hasNext: page < totalPages,
+    hasPrev: page > 1,
+    items: rows,
+  };
 };
 
 /**
@@ -85,7 +106,7 @@ const deleteRecord = async (id) => {
 
 module.exports = {
     createRecord,
-    getAllRecords,
+    getRecordsPaginated,
     getRecordById,
     deleteRecord, // เพิ่มฟังก์ชัน delete เข้าไป
 };

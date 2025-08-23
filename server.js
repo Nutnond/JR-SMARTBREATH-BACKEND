@@ -2,10 +2,15 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const db = require('./models');
+const cors = require('cors'); // 1. Import cors
 
 dotenv.config();
 
 const app = express();
+
+// 2. Enable CORS for all routes
+// This will allow requests from any origin.
+app.use(cors()); 
 
 // Middlewares: แปลง request body ให้เป็น JSON
 app.use(express.json());

@@ -6,7 +6,7 @@ on:
       - master
 
 env:
-  DOCKER_IMAGE: docker.io/${{ secrets.DOCKER_USERNAME }}/jr-smartbreath   # ชื่อรูปบน Docker Hub
+  DOCKER_IMAGE: ${{ secrets.DOCKER_USERNAME }}/jr-smartbreath   # ชื่อรูปบน Docker Hub
   NODE_ENV: production
 
 jobs:
@@ -61,4 +61,4 @@ jobs:
       - name: Push Docker Image(s)
         run: |
           docker push ${{ env.DOCKER_IMAGE }}:latest
-          
+

@@ -61,3 +61,4 @@ jobs:
       - name: Push Docker Image(s)
         run: |
           docker push ${{ env.DOCKER_IMAGE }}:latest
+          

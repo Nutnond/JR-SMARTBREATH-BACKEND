@@ -53,10 +53,29 @@ const updateMachine = async (id, updateData) => {
     throw new Error('Failed to update machine.');
 };
 
+const touchMachine = async (id) => {
+  // ใช้ Model.update() เพื่อสั่งอัปเดตเฉพาะฟิลด์ที่ต้องการ
+  // โดย Sequelize จะอัปเดตแค่ฟิลด์ updatedAt โดยอัตโนมัติเมื่อมีการเปลี่ยนแปลง
+  // แต่เพื่อความชัดเจน เราสามารถระบุโดยตรงได้
+  const [num] = await Machine.update(
+    { updatedAt: new Date() }, // ระบุให้อัปเดตเวลาเป็นปัจจุบันโดยตรง
+    { where: { id: id } }
+  );
+
+  // ตรวจสอบว่ามีแถวที่ถูกอัปเดตหรือไม่
+  if (num === 1) {
+    // ถ้าสำเร็จ ให้ดึงข้อมูลล่าสุดกลับไป
+    return await getMachineById(id);
+  }
+
+  // ถ้า num เป็น 0 หมายความว่าไม่พบ ID ดังกล่าวในระบบ
+  throw new Error(`Machine with ID ${id} not found or failed to touch.`);
+};
+
 const deleteMachine = async (id) => {
     const num = await Machine.destroy({ where: { id: id } });
     if (num === 0) throw new Error('Machine not found.');
     return { message: 'Machine deleted successfully.' };
 };
 
-module.exports = { createMachine, getAllMachines, getMachineById, updateMachine, deleteMachine };
+module.exports = { createMachine, getAllMachines, getMachineById, updateMachine, deleteMachine,touchMachine };

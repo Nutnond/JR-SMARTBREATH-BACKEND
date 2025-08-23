@@ -6,7 +6,7 @@ module.exports = app => {
 
     router.post("/", records.create);
     router.get("/",[verifyToken], records.findAll);
-    // router.get("/:id", records.findOne);
+    router.get("/:id",[verifyToken], records.findOne);
 
     app.use('/records', router);
 };

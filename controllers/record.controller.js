@@ -105,3 +105,36 @@ exports.findAll = async (req, res) => {
         handleErrors(res, error);
     }
 };
+
+
+/**
+ * ลบข้อมูลการวัดผล (Record)
+ */
+exports.delete = async (req, res) => {
+    try {
+        // 1. ดึง ID ของ record ที่จะลบจาก URL params
+        const recordId = req.params.id;
+
+        // 2. ตรวจสอบสิทธิ์ความเป็นเจ้าของก่อนทำการลบ
+        //    - ดึงข้อมูล record เพื่อหา machineId
+        const recordToDelete = await recordService.getRecordById(recordId);
+        //    - ดึงข้อมูล machine เพื่อหา ownerId
+        const machine = await machineService.getMachineById(recordToDelete.machineId);
+        
+        //    - เปรียบเทียบ ownerId กับ userId ของผู้ที่ login อยู่
+        if (machine.ownerId !== req.userId) {
+            return res.status(403).send({ message: "คุณไม่มีสิทธิ์ลบข้อมูลนี้" });
+        }
+
+        // 3. ถ้ามีสิทธิ์ ให้เรียก service เพื่อลบข้อมูล
+        const result = await recordService.deleteRecord(recordId);
+        
+        // 4. ส่งผลลัพธ์การลบกลับไป (ซึ่งจะมี message บอกว่าลบสำเร็จ)
+        res.status(200).send(result);
+
+    } catch (error) {
+        // หากเกิดข้อผิดพลาด (เช่นหา record ไม่เจอ) ให้ส่งไปที่ error handler
+        handleErrors(res, error);
+    }
+};
+

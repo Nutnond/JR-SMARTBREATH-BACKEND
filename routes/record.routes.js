@@ -7,6 +7,6 @@ module.exports = app => {
     router.post("/", records.create);
     router.get("/",[verifyToken], records.findAll);
     router.get("/:id",[verifyToken], records.findOne);
-
+    router.delete("/:id",[verifyToken], records.delete);
     app.use('/records', router);
 };

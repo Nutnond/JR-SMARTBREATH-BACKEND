@@ -15,6 +15,12 @@ module.exports = (sequelize) => {
       unique: true,
       field: 'device_name',
     },
+    model: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      unique: true,
+      field: 'model',
+    },
     ownerId: {
       type: DataTypes.CHAR(36),
       allowNull: false,

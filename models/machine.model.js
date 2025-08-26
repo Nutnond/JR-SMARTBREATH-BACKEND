@@ -23,7 +23,7 @@ module.exports = (sequelize) => {
     },
     ownerId: {
       type: DataTypes.CHAR(36),
-      allowNull: false,
+      allowNull: true,
       field: 'owner_id',
       references: {
         model: 'users', // ชื่อตาราง

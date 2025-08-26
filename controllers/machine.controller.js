@@ -75,6 +75,8 @@ exports.update = async (req, res) => {
         const machineToUpdate = await machineService.getMachineById(machineId);
 
         // 2. --- 🔐 ตรวจสอบความเป็นเจ้าของ ---
+        console.log(req.userId +"  "+ machineToUpdate.ownerId);
+        
         if (machineToUpdate.ownerId !== req.userId) {
             return res.status(403).send({ message: "คุณไม่มีสิทธิ์แก้ไขข้อมูลนี้" });
         }
@@ -107,6 +109,63 @@ exports.delete = async (req, res) => {
 
         // 3. ถ้าเป็นเจ้าของจริง จึงทำการลบ
         const result = await machineService.deleteMachine(machineId);
+        res.status(200).send(result); // ส่ง message จาก service กลับไปโดยตรง
+
+    } catch (error) {
+        handleErrors(res, error);
+    }
+};
+
+
+/**
+ * reset ข้อมูลเครื่อง
+ */
+exports.reset = async (req, res) => {
+    try {
+        const machineId = req.params.id;
+
+        // 1. ดึงข้อมูลเครื่องที่จะลบเพื่อตรวจสอบความเป็นเจ้าของก่อน
+        const machineToDelete = await machineService.getMachineById(machineId);
+
+        // 2. --- 🔐 ตรวจสอบความเป็นเจ้าของ ---
+        if (machineToDelete.ownerId !== req.userId) {
+            return res.status(403).send({ message: "คุณไม่มีสิทธิ์ลบข้อมูลนี้" });
+        }
+        // --- สิ้นสุดการตรวจสอบ ---
+
+        // 3. ถ้าเป็นเจ้าของจริง จึงทำการลบ
+        const result = await machineService.resetMachine(machineId);
+        res.status(200).send(result); // ส่ง message จาก service กลับไปโดยตรง
+
+    } catch (error) {
+        handleErrors(res, error);
+    }
+};
+
+
+
+/**
+ * register device
+ */
+exports.register = async (req, res) => {
+    try {
+        const machineId = req.params.id;
+
+        // 1. ดึงข้อมูลเครื่องที่จะลบเพื่อตรวจสอบความเป็นเจ้าของก่อน
+        const machine = await machineService.getMachineById(machineId);
+
+        // 2. --- 🔐 ตรวจสอบความเป็นเจ้าของ ---
+        if (machine.ownerId) {
+            return res.status(403).send({ message: "อุปกรณ์นี้มีผู้ใช้งานแล้ว" });
+        }
+        // --- สิ้นสุดการตรวจสอบ ---
+
+        if(!req.userId){
+            return res.status(401).send({message:"ไม่พบผู้ใช้งานในระบบ"})
+        }
+
+        // 3. ถ้าเป็นเจ้าของจริง จึงทำการลบ
+        const result = await machineService.registerMachine(req.userId,machineId,req.body);
         res.status(200).send(result); // ส่ง message จาก service กลับไปโดยตรง
 
     } catch (error) {

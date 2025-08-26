@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายงานผลการวัด - JR-SMARTBREATH</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --success-color: #4CAF50;
+            --warning-color: #FF9800;
+            --danger-color: #f44336;
+            --text-primary: #2d3748;
+            --text-secondary: #4a5568;
+            --text-muted: #718096;
+            --bg-light: #f8fafc;
+            --bg-card: #ffffff;
+            --border-light: #e2e8f0;
+        }
+
+        /* PDF-Optimized Styles */
+        body {
+            font-family: 'Sarabun', sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: white;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .container {
+            max-width: 210mm;
+            /* A4 width */
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Header Section */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .header-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 16px;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .report-id {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Content Section */
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 35px;
+            page-break-inside: avoid;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid var(--border-light);
+            position: relative;
+        }
+
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--primary-color);
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: white;
+            font-size: 20px;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .section h2 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Grid Layout */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .info-grid.single-column {
+            grid-template-columns: 1fr;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            padding: 20px;
+            position: relative;
+            page-break-inside: avoid;
+        }
+
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-color);
+            border-radius: 2px 0 0 2px;
+        }
+
+        .info-label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+
+        /* Measurement Highlights */
+        .measurement-highlight {
+            background: var(--primary-color) !important;
+            color: white !important;
+            border-color: var(--primary-color) !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .measurement-highlight::before {
+            background: rgba(255, 255, 255, 0.3) !important;
+        }
+
+        .measurement-highlight .info-label {
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+
+        .measurement-highlight .info-value {
+            color: white !important;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: white;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .status-badge::before {
+            content: '●';
+            margin-right: 6px;
+            font-size: 8px;
+        }
+
+        .status-normal {
+            background: var(--success-color);
+        }
+
+        .status-warning {
+            background: var(--warning-color);
+        }
+
+        .status-danger {
+            background: var(--danger-color);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--bg-light);
+            text-align: center;
+            padding: 25px 30px;
+            border-top: 1px solid var(--border-light);
+            margin-top: 20px;
+        }
+
+        .footer-content {
+            color: var(--text-muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .generation-time {
+            margin-top: 10px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* PDF-specific optimizations */
+        @media print,
+        (max-device-width: 1024px) {
+            body {
+                font-size: 12px;
+            }
+
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+
+            .header {
+                page-break-after: avoid;
+            }
+
+            .section {
+                page-break-inside: avoid;
+                margin-bottom: 25px;
+            }
+
+            .info-grid {
+                gap: 15px;
+            }
+
+            .info-card {
+                padding: 15px;
+            }
+
+            .measurement-highlight .info-value {
+                font-size: 20px;
+            }
+        }
+
+        /* Single column layout for important sections */
+        .measurements-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .measurements-grid .info-card:nth-child(-n+4) {
+            /* First 4 measurement cards get highlight treatment */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+
+            .info-grid,
+            .measurements-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+        }
+
+        /* Additional utility classes */
+        .text-center {
+            text-align: center;
+        }
+
+        .text-large {
+            font-size: 16px;
+        }
+
+        .font-bold {
+            font-weight: 600;
+        }
+
+        .mb-small {
+            margin-bottom: 10px;
+        }
+
+        .mt-small {
+            margin-top: 10px;
+        }
+
+
+        /* === Force A4 size when printing/export PDF === */
+        @page {
+            size: A4 portrait;
+            margin: 12mm;
+            /* ปรับได้ 10–15mm */
+        }
+
+        /* Make sure container fits inside A4 */
+        .container {
+            width: 100%;
+            max-width: calc(210mm - 24mm);
+            /* A4 width 210mm - (2 * margin) */
+            min-height: calc(297mm - 24mm);
+            /* A4 height - margin */
+            margin: 0 auto;
+            page-break-inside: avoid;
+        }
+
+        /* Prevent content from splitting awkwardly */
+        .section,
+        .header,
+        .footer {
+            page-break-inside: avoid;
+            page-break-before: auto;
+            page-break-after: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            <div class="header-icon">🫁</div>
+            <h1>รายงานผลการวัดค่า</h1>
+            <p>JR-SMARTBREATH Monitoring System</p>
+            <div class="report-id">รหัสรายงาน: RPT-<%= record.id.substring(0, 8).toUpperCase() %>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Device Information Section -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">📱</div>
+                    <h2>ข้อมูลอุปกรณ์</h2>
+                </div>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <span class="info-label">ชื่ออุปกรณ์</span>
+                        <div class="info-value">
+                            <%= machine.deviceName %>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-label">รุ่น</span>
+                        <div class="info-value">
+                            <%= machine.model || 'ไม่ระบุ' %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Measurements Section -->
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-icon">📊</div>
+                    <h2>ผลการวัด</h2>
+                </div>
+                <div class="measurements-grid">
+                    <div class="info-card measurement-highlight">
+                        <span class="info-label">SpO2 (ออกซิเจนในเลือด)</span>
+                        <div class="info-value">
+                            <%= record.spo2 %> <small style="font-size: 14px;">%</small>
+                        </div>
+                    </div>
+                    <div class="info-card measurement-highlight">
+                        <span class="info-label">FEV1 (ปริมาณลมหายใจ)</span>
+                        <div class="info-value">
+                            <%= record.fev1 %> <small style="font-size: 14px;">ลิตร</small>
+                        </div>
+                    </div>
+                    <div class="info-card measurement-highlight">
+                        <span class="info-label">FVC (ความจุปอด)</span>
+                        <div class="info-value">
+                            <%= record.fvc %> <small style="font-size: 14px;">ลิตร</small>
+                        </div>
+                    </div>
+                    <div class="info-card measurement-highlight">
+                        <span class="info-label">PEF (อัตราการไหลสูงสุด)</span>
+                        <div class="info-value">
+                            <%= record.pef %> <small style="font-size: 14px;">ลิตร/วินาที</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Status and Time in separate grid -->
+                <div class="info-grid" style="margin-top: 20px;">
+                    <div class="info-card">
+                        <span class="info-label">สถานะการทำงานปอด (FEV1/FVC)</span>
+                        <div class="info-value">
+                            <% var statusClass='status-normal' ; var statusText='ปกติ' ; var
+                                ratio=parseFloat(record.fev1Fvc); if (!isNaN(ratio)) { if (ratio < 0.45) {
+                                statusClass='status-danger' ; statusText='การอุดกั้นรุนแรง' ; } else if (ratio < 0.60) {
+                                statusClass='status-danger' ; statusText='การอุดกั้นปานกลาง' ; } else if (ratio < 0.70)
+                                { statusClass='status-warning' ; statusText='การอุดกั้นเล็กน้อย' ; } } else {
+                                statusClass='status-warning' ; statusText='ข้อมูลไม่สมบูรณ์' ; } %>
+                                <span class="status-badge <%= statusClass %>">
+                                    <%= statusText %>
+                                </span>
+                                <% if (!isNaN(ratio)) { %>
+                                    <div style="margin-top: 8px; font-size: 14px; color: #666;">
+                                        อัตราส่วน: <%= ratio.toFixed(2) %>
+                                    </div>
+                                    <% } %>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <span class="info-label">เวลาที่ทำการวัด</span>
+                        <div class="info-value text-large">
+                            <%= new Date(record.measuredAt).toLocaleString('th-TH', { weekday: 'long' , year: 'numeric'
+                                , month: 'long' , day: 'numeric' , hour: '2-digit' , minute: '2-digit' ,
+                                timeZone: 'Asia/Bangkok' }) %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Notes Section (if available) -->
+            <% if (record.notes) { %>
+                <div class="section">
+                    <div class="section-header">
+                        <div class="section-icon">📝</div>
+                        <h2>หมายเหตุเพิ่มเติม</h2>
+                    </div>
+                    <div class="info-grid single-column">
+                        <div class="info-card">
+                            <span class="info-label">บันทึกเพิ่มเติม</span>
+                            <div class="info-value" style="font-size: 16px; line-height: 1.6;">
+                                <%= record.notes %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+
+
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <!-- Reference Values Section -->
+            <div
+                style="background: white; padding: 25px 30px; margin-bottom: 20px; border: 1px solid var(--border-light); border-radius: 12px;">
+                <div
+                    style="display: flex; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--border-light);">
+                    <div
+                        style="width: 35px; height: 35px; background: var(--primary-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px; color: white; font-size: 16px;">
+                        📋</div>
+                    <h3 style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin: 0;">ค่าอ้างอิงปกติ
+                    </h3>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 15px;">
+                    <div
+                        style="background: var(--bg-light); padding: 15px; border-radius: 8px; border-left: 3px solid var(--success-color);">
+                        <div
+                            style="font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; text-transform: uppercase;">
+                            SpO2 ปกติ</div>
+                        <div style="font-size: 16px; font-weight: 600; color: var(--text-primary);">95-100%</div>
+                    </div>
+                    <div
+                        style="background: var(--bg-light); padding: 15px; border-radius: 8px; border-left: 3px solid var(--success-color);">
+                        <div
+                            style="font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; text-transform: uppercase;">
+                            FEV1/FVC ปกติ</div>
+                        <div style="font-size: 16px; font-weight: 600; color: var(--text-primary);">> 0.70</div>
+                    </div>
+                </div>
+                <div
+                    style="padding: 12px; background: #f0f8ff; border-left: 4px solid var(--primary-color); border-radius: 0 6px 6px 0;">
+                    <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.4; margin: 0;">
+                        <strong>คำแนะนำ:</strong> ค่าที่วัดได้ควรอยู่ในช่วงปกติ หากผลการตรวจพบความผิดปกติ
+                        ควรปรึกษาแพทย์เพื่อรับการวินิจฉัยและการรักษาที่เหมาะสม
+                    </p>
+                </div>
+            </div>
+
+            <div class="footer-content">
+                <div><strong>เอกสารนี้สร้างโดยระบบอัตโนมัติ JR-SMARTBREATH</strong></div>
+                <div style="margin: 8px 0;">🏥 ระบบตรวจสอบสุขภาพปอดอัจฉริยะ</div>
+                <div class="generation-time">
+                    วันที่สร้างรายงาน: <%= new Date().toLocaleString('th-TH', { year: 'numeric' , month: 'long' ,
+                        day: 'numeric' , hour: '2-digit' , minute: '2-digit' , timeZone: 'Asia/Bangkok' }) %>
+                </div>
+                <div style="margin-top: 10px; font-size: 12px; color: var(--text-muted);">
+                    เอกสารฉบับนี้ได้รับการรับรองทางการแพทย์ตามมาตรฐานสากล
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

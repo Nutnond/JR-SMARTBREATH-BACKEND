@@ -1,7 +1,7 @@
 // controllers/record.controller.js
 const recordService = require('../services/record.service');
 const machineService = require('../services/machine.service');
-
+const { createReportPdf } = require('../services/file-result-service');
 /**
  * ฟังก์ชันกลางสำหรับจัดการข้อผิดพลาดและส่ง response กลับไป
  */
@@ -138,3 +138,45 @@ exports.delete = async (req, res) => {
     }
 };
 
+
+// controllers/record.controller.js
+
+exports.downloadReport = async (req, res) => {
+    try {
+        
+        // --- 1. ดึงข้อมูลผู้ใช้ที่ล็อกอิน และ ID ของ Record ที่ต้องการ ---
+        const currentUser = req.userId // สมมติว่า verifyToken เก็บข้อมูล user ไว้ที่นี่
+        const recordId = req.params.id;
+        
+        // --- 2. ดึงข้อมูล Record พร้อมข้อมูลเจ้าของ ---
+        const recordData = await recordService.getRecordById(recordId);
+
+        // --- 3. ตรวจสอบสิทธิ์การเข้าถึง ---
+        // `recordData.machine.ownerId` คือ ID ของเจ้าของเครื่องที่ผูกกับ Record นี้
+        const isOwner = recordData.machine.ownerId === currentUser
+                
+
+        // ถ้าไม่ใช่เจ้าของ และไม่ใช่ Admin ให้ปฏิเสธการเข้าถึง
+        if (!isOwner) {
+            return res.status(403).send({ 
+                message: "คุณไม่มีสิทธิ์เข้าถึงข้อมูลนี้ (Forbidden)" 
+            });
+        }
+        
+
+        // --- 4. ถ้ามีสิทธิ์ ให้สร้างและส่ง PDF ตามปกติ ---
+        const pdfBuffer = await createReportPdf(recordData);
+        
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename=report-${recordId}.pdf`);
+        
+        res.send(pdfBuffer);
+
+    } catch (error) {
+        // เพิ่มการตรวจสอบ error กรณี "ไม่พบข้อมูล"
+        if (error.message === 'ไม่พบข้อมูลการวัดผล') {
+            return res.status(404).send({ message: error.message });
+        }
+        res.status(500).send({ message: error.message || "เกิดข้อผิดพลาดในการสร้างรายงาน" });
+    }
+};

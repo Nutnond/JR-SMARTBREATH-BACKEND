@@ -2,6 +2,7 @@
 const Joi = require('joi');
 const { v4: uuidv4 } = require('uuid');
 const { Record, Machine } = require('../models');
+const { createReportPdf } = require('../services/file-result-service');
 
 // Schema สำหรับตรวจสอบข้อมูลตอนสร้าง Record
 const createRecordSchema = Joi.object({
@@ -109,11 +110,10 @@ const deleteRecord = async (id) => {
     }
     return { message: 'ลบข้อมูลการวัดผลสำเร็จ' };
 };
-
-
+ 
 module.exports = {
     createRecord,
     getRecordsPaginated,
     getRecordById,
-    deleteRecord,
+    deleteRecord
 };

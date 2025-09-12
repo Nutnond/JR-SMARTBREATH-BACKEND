@@ -44,14 +44,14 @@ exports.create = async (req, res) => {
 exports.findOne = async (req, res) => {
     try {
         const recordId = req.params.id;
-
+         const username = req.username
         const record = await recordService.getRecordById(recordId);
 
         // ✅ การตรวจสอบสิทธิ์ (Authorization)
         // ตรวจสอบว่าเจ้าของเครื่องตรงกับ user ที่ login อยู่หรือไม่
         const machine = await machineService.getMachineById(record.machineId);
-        
-        if (machine.ownerId !== req.userId) {
+        const isClient = username == "CLIENT_TOKEN"
+        if (machine.ownerId !== req.userId && !isClient) {
             return res.status(403).send({ message: "คุณไม่มีสิทธิ์ดูข้อมูลการวัดผลของเครื่องอื่น" });
         }
 
@@ -68,6 +68,7 @@ exports.findOne = async (req, res) => {
  */
 exports.findAll = async (req, res) => {
     try {
+        const username = req.username
         const { machineId } = req.query;
         if (!machineId) {
             return res.status(400).send({ message: "จำเป็นต้องระบุ 'machineId' ใน query parameter" });
@@ -75,7 +76,10 @@ exports.findAll = async (req, res) => {
 
         // ตรวจสอบเครื่อง + สิทธิ์เจ้าของ
         const machine = await machineService.getMachineById(machineId);
-        if (machine.ownerId !== req.userId) {
+        const isClient = username == "CLIENT TOKEN"
+
+
+        if (machine.ownerId !== req.userId && !isClient) {
             return res.status(403).send({ message: "คุณไม่มีสิทธิ์ดูข้อมูลการวัดผลของเครื่องอื่น" });
         }
 
@@ -154,8 +158,6 @@ exports.downloadReport = async (req, res) => {
         // --- 3. ตรวจสอบสิทธิ์การเข้าถึง ---
         // `recordData.machine.ownerId` คือ ID ของเจ้าของเครื่องที่ผูกกับ Record นี้
         const isOwner = recordData.machine.ownerId === currentUser
-                
-
         // ถ้าไม่ใช่เจ้าของ และไม่ใช่ Admin ให้ปฏิเสธการเข้าถึง
         if (!isOwner) {
             return res.status(403).send({ 

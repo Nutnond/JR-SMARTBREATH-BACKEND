@@ -25,6 +25,16 @@ module.exports = (sequelize) => {
       allowNull: false,
       unique: true,
     },
+    dob: {
+      type: DataTypes.DATEONLY,
+      field: 'date_of_birth',
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING(100),
+      allowNull: false,
+      unique: true,
+    },
     email: {
       type: DataTypes.STRING(100),
       allowNull: false,

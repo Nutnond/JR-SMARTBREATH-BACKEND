@@ -30,13 +30,13 @@ exports.register = async (req, res) => {
       weight,
       height,
       gender,
-      age,
+      dob,
       firstName,
       lastName
     } = req.body;
 
     // 2. ตรวจสอบว่ามีข้อมูลที่จำเป็นครบถ้วน
-    if (!username || !email || !password || !weight || !height || !gender || !age || !firstName || !lastName) {
+    if (!username || !email || !password || !weight || !height || !gender || !dob || !firstName || !lastName) {
       return res.status(400).send({ message: "กรุณากรอกข้อมูลการสมัครสมาชิกให้ครบถ้วน" });
     }
     
@@ -53,9 +53,9 @@ exports.register = async (req, res) => {
       weight,
       height,
       gender,
-      age,
       firstName,
-      lastName
+      lastName,
+      dob
     });
 
     // 4. ส่ง response การสมัครสำเร็จ (โดยไม่มีรหัสผ่าน)

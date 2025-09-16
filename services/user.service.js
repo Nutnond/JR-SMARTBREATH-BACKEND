@@ -14,8 +14,7 @@ const createUserSchema = Joi.object({
     weight: Joi.number().positive().required(),
     height: Joi.number().positive().required(),
     gender: Joi.string().valid('Male', 'Female', 'Other').required(),
-    // ✅ ADDED: age field
-    age: Joi.number().integer().positive().required()
+    dob: Joi.date().iso().less('now').required(),
 });
 
 const updateUserSchema = Joi.object({
@@ -26,8 +25,6 @@ const updateUserSchema = Joi.object({
     weight: Joi.number().positive(),
     height: Joi.number().positive(),
     gender: Joi.string().valid('Male', 'Female', 'Other'),
-    // ✅ ADDED: age field
-    age: Joi.number().integer().positive()
 }).min(1);
 
 const createUser = async (userData) => {

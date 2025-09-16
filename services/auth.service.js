@@ -78,7 +78,8 @@ const register = async (userData) => {
         gender: userData.gender,
         age: userData.age,
         firstName: userData.firstName,
-        lastName: userData.lastName
+        lastName: userData.lastName,
+        dob: userData.dob
     });
 
     // 4. คืนค่าข้อมูลผู้ใช้ใหม่ (โดยลบรหัสผ่านออก)

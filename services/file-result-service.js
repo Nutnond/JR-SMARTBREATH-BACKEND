@@ -12,10 +12,10 @@ const { log } = require('console');
  */
 const createReportPdf = async (recordData) => {
     try {
-        
+
         const templatePath = path.join(__dirname, '..', 'views', 'record-result-template.ejs');
         const template = fs.readFileSync(templatePath, 'utf-8');
-        
+
         // 2. นำข้อมูลไปใส่ใน template (Render HTML)
         const html = ejs.render(template, {
             record: recordData,
@@ -24,17 +24,23 @@ const createReportPdf = async (recordData) => {
 
         // 3. ใช้ Puppeteer สร้าง PDF
         const browser = await puppeteer.launch({
-             args: ['--no-sandbox', '--disable-setuid-sandbox'] // สำหรับรันบน Server/Linux
+            args: ['--no-sandbox', '--disable-setuid-sandbox'] // สำหรับรันบน Server/Linux
         });
         const page = await browser.newPage();
-        
+
         // กำหนดเนื้อหา HTML ให้กับหน้าเว็บ
         await page.setContent(html, { waitUntil: 'networkidle0' });
 
         // สร้าง PDF
         const pdfBuffer = await page.pdf({
             format: 'A4',
-            printBackground: true // สำคัญมาก! เพื่อให้สีพื้นหลังและ CSS แสดงผล
+            printBackground: true, // สำคัญมาก! เพื่อให้สีพื้นหลังและ CSS แสดงผล
+            margin: {
+                top: '20mm',
+                right: '10mm',
+                bottom: '20mm',
+                left: '10mm'
+            }
         });
 
         await browser.close();

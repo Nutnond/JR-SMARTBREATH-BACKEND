@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>รายงานผลการวัด - JR-SMARTBREATH</title>
+    <title>รายงานผลการวัด - SMARTBREATH</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap');
 
@@ -30,78 +30,104 @@
 
         /* PDF-Optimized Styles */
         body {
-            font-family: 'Sarabun', sans-serif;
+            font-family: 'Sarabun', 'TH SarabunPSK', 'Helvetica', 'Arial', sans-serif;
             font-size: 14px;
             line-height: 1.6;
             color: var(--text-primary);
             background: white;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
+            margin: 0;
+            padding: 0;
         }
 
         .container {
+            width: 100%;
             max-width: 210mm;
-            /* A4 width */
             margin: 0 auto;
             background: white;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            min-height: 100vh;
         }
 
         /* Header Section */
         .header {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
-            padding: 30px;
+            padding: 25mm 20mm 15mm 20mm;
             text-align: center;
             position: relative;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
+            page-break-after: avoid;
         }
 
         .header-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
+            font-size: 42px;
+            margin-bottom: 12px;
             display: block;
         }
 
         .header h1 {
-            font-size: 28px;
+            font-size: 26px;
             font-weight: 700;
             margin-bottom: 8px;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .header p {
-            font-size: 16px;
-            margin-bottom: 15px;
+            font-size: 15px;
+            margin-bottom: 12px;
             opacity: 0.9;
         }
 
         .report-id {
             display: inline-block;
             background: rgba(255, 255, 255, 0.2);
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-size: 14px;
+            padding: 6px 18px;
+            border-radius: 18px;
+            font-size: 13px;
             font-weight: 600;
             border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
         /* Content Section */
         .content {
-            padding: 30px;
+            padding: 15mm 20mm;
         }
 
         .section {
-            margin-bottom: 35px;
+            margin-top: 20px;
+            margin-bottom: 25px;
+            page-break-inside: avoid;
+            /* ป้องกันการตัด section ขึ้นหน้าใหม่ */
+        }
+
+        /* START: Style for forcing a page break before a specific element */
+        .force-page-break-before {
+            page-break-before: always;
+        }
+
+        /* END: Style for forcing a page break */
+
+        /* START: Style to keep a group of elements together */
+        .unbreakable-group {
             page-break-inside: avoid;
         }
+
+        /* END: Style to keep a group of elements together */
+
+        /* START: Style for adding top margin */
+        .extra-margin-top {
+            margin-top: 40px;
+        }
+
+        /* END: Style for adding top margin */
 
         .section-header {
             display: flex;
             align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
             border-bottom: 3px solid var(--border-light);
             position: relative;
         }
@@ -111,28 +137,29 @@
             position: absolute;
             bottom: -3px;
             left: 0;
-            width: 50px;
+            width: 45px;
             height: 3px;
             background: var(--primary-color);
         }
 
         .section-icon {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             background: var(--primary-color);
-            border-radius: 10px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 15px;
+            margin-right: 12px;
             color: white;
-            font-size: 20px;
+            font-size: 18px;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
+            flex-shrink: 0;
         }
 
         .section h2 {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
             color: var(--text-primary);
         }
@@ -141,7 +168,7 @@
         .info-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            gap: 15px;
         }
 
         .info-grid.single-column {
@@ -151,10 +178,13 @@
         .info-card {
             background: var(--bg-card);
             border: 2px solid var(--border-light);
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 10px;
+            padding: 18px;
             position: relative;
             page-break-inside: avoid;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
         }
 
         .info-card::before {
@@ -173,16 +203,20 @@
             font-weight: 600;
             color: var(--text-secondary);
             margin-bottom: 8px;
-            font-size: 12px;
+            font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
+            line-height: 1.4;
         }
 
         .info-value {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 600;
             color: var(--text-primary);
             line-height: 1.3;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
         }
 
         /* Measurement Highlights */
@@ -204,18 +238,26 @@
 
         .measurement-highlight .info-value {
             color: white !important;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 700;
+        }
+
+        /* Measurements Grid */
+        .measurements-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
         /* Status Badges */
         .status-badge {
             display: inline-flex;
             align-items: center;
-            padding: 8px 16px;
-            border-radius: 20px;
+            padding: 6px 14px;
+            border-radius: 16px;
             font-weight: 600;
-            font-size: 12px;
+            font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: white;
@@ -225,7 +267,7 @@
 
         .status-badge::before {
             content: '●';
-            margin-right: 6px;
+            margin-right: 5px;
             font-size: 8px;
         }
 
@@ -241,51 +283,188 @@
             background: var(--danger-color);
         }
 
+        /* Comparison Table Styles */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 12px;
+            page-break-inside: avoid;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .comparison-table thead th {
+            font-weight: 700;
+            color: var(--text-secondary);
+            background-color: var(--bg-light);
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .comparison-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table tbody tr.highlight-row {
+            background-color: #fef9e7;
+            font-weight: 600;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        /* START: Added Style for Gender Subtitle */
+        .gender-subtitle {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-top: 25px;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border-light);
+        }
+
+        .gender-subtitle:first-of-type {
+            margin-top: 5px;
+        }
+
+        /* END: Added Style for Gender Subtitle */
+
+
+        /* Reference Values Section */
+        .reference-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+        }
+
+        .reference-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border-light);
+        }
+
+        .reference-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--primary-color);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .reference-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .reference-item {
+            background: var(--bg-light);
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid var(--success-color);
+        }
+
+        .reference-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+
+        .reference-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .advice-box {
+            padding: 10px;
+            background: #f0f8ff;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 0 5px 5px 0;
+        }
+
+        .advice-text {
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            margin: 0;
+        }
+
         /* Footer */
         .footer {
             background: var(--bg-light);
             text-align: center;
-            padding: 25px 30px;
+            padding: 20mm 20mm 15mm 20mm;
             border-top: 1px solid var(--border-light);
-            margin-top: 20px;
         }
 
         .footer-content {
             color: var(--text-muted);
-            font-size: 13px;
+            font-size: 12px;
             line-height: 1.6;
         }
 
         .generation-time {
-            margin-top: 10px;
+            margin-top: 8px;
             font-weight: 600;
             color: var(--text-secondary);
-            font-size: 14px;
+            font-size: 13px;
         }
 
-        /* PDF-specific optimizations */
-        @media print,
-        (max-device-width: 1024px) {
+        /* PDF Page Settings */
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+
+        /* Print-specific optimizations */
+        @media print {
             body {
                 font-size: 12px;
             }
 
             .container {
                 box-shadow: none;
-                max-width: none;
+                max-width: 210mm;
+                width: 100%;
+                padding: 0;
+                margin: 0;
+            }
+
+            .content {
+                padding: 15mm 15mm;
+                /* ลด padding ด้านข้างเล็กน้อยสำหรับ A4 */
             }
 
             .header {
-                page-break-after: avoid;
+                padding: 20mm 15mm 15mm 15mm;
             }
 
             .section {
-                page-break-inside: avoid;
-                margin-bottom: 25px;
+                margin-bottom: 20px;
             }
 
-            .info-grid {
-                gap: 15px;
+            .info-grid,
+            .measurements-grid {
+                gap: 12px;
             }
 
             .info-card {
@@ -293,26 +472,16 @@
             }
 
             .measurement-highlight .info-value {
-                font-size: 20px;
+                font-size: 18px;
             }
         }
 
-        /* Single column layout for important sections */
-        .measurements-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-
-        .measurements-grid .info-card:nth-child(-n+4) {
-            /* First 4 measurement cards get highlight treatment */
-        }
-
-        /* Responsive adjustments */
+        /* Single column layout for mobile/small screens */
         @media (max-width: 600px) {
 
             .info-grid,
-            .measurements-grid {
+            .measurements-grid,
+            .reference-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -325,13 +494,13 @@
             }
         }
 
-        /* Additional utility classes */
+        /* Utility classes */
         .text-center {
             text-align: center;
         }
 
         .text-large {
-            font-size: 16px;
+            font-size: 15px;
         }
 
         .font-bold {
@@ -339,66 +508,34 @@
         }
 
         .mb-small {
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .mt-small {
-            margin-top: 10px;
-        }
-
-
-        /* === Force A4 size when printing/export PDF === */
-        @page {
-            size: A4 portrait;
-            margin: 12mm;
-            /* ปรับได้ 10–15mm */
-        }
-
-        /* Make sure container fits inside A4 */
-        .container {
-            width: 100%;
-            max-width: calc(210mm - 24mm);
-            /* A4 width 210mm - (2 * margin) */
-            min-height: calc(297mm - 24mm);
-            /* A4 height - margin */
-            margin: 0 auto;
-            page-break-inside: avoid;
-        }
-
-        /* Prevent content from splitting awkwardly */
-        .section,
-        .header,
-        .footer {
-            page-break-inside: avoid;
-            page-break-before: auto;
-            page-break-after: auto;
+            margin-top: 8px;
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <!-- Header Section -->
         <div class="header">
-            <div class="header-icon">🫁</div>
             <h1>รายงานผลการวัดค่า</h1>
-            <p>JR-SMARTBREATH Monitoring System</p>
-            <div class="report-id">รหัสรายงาน: RPT-<%= record.id.substring(0, 8).toUpperCase() %>
+            <p>SMARTBREATH Monitoring System</p>
+            <div class="report-id">รหัสรายงาน: RPT-<%= (record.id || 'UNKNOWN' ).substring(0, 8).toUpperCase() %>
             </div>
         </div>
 
         <div class="content">
-            <!-- Device Information Section -->
             <div class="section">
                 <div class="section-header">
-                    <div class="section-icon">📱</div>
                     <h2>ข้อมูลอุปกรณ์</h2>
                 </div>
                 <div class="info-grid">
                     <div class="info-card">
                         <span class="info-label">ชื่ออุปกรณ์</span>
                         <div class="info-value">
-                            <%= machine.deviceName %>
+                            <%= machine.deviceName || 'ไม่ระบุ' %>
                         </div>
                     </div>
                     <div class="info-card">
@@ -410,73 +547,287 @@
                 </div>
             </div>
 
-            <!-- Measurements Section -->
             <div class="section">
                 <div class="section-header">
-                    <div class="section-icon">📊</div>
                     <h2>ผลการวัด</h2>
                 </div>
                 <div class="measurements-grid">
                     <div class="info-card measurement-highlight">
                         <span class="info-label">SpO2 (ออกซิเจนในเลือด)</span>
                         <div class="info-value">
-                            <%= record.spo2 %> <small style="font-size: 14px;">%</small>
+                            <%= record.spo2 || 'ไม่ระบุ' %> <small style="font-size: 13px;"> %</small>
                         </div>
                     </div>
                     <div class="info-card measurement-highlight">
                         <span class="info-label">FEV1 (ปริมาณลมหายใจ)</span>
                         <div class="info-value">
-                            <%= record.fev1 %> <small style="font-size: 14px;">ลิตร</small>
+                            <%= record.fev1 || 'ไม่ระบุ' %> <small style="font-size: 13px;"> ลิตร</small>
                         </div>
                     </div>
                     <div class="info-card measurement-highlight">
                         <span class="info-label">FVC (ความจุปอด)</span>
                         <div class="info-value">
-                            <%= record.fvc %> <small style="font-size: 14px;">ลิตร</small>
+                            <%= record.fvc || 'ไม่ระบุ' %> <small style="font-size: 13px;"> ลิตร</small>
                         </div>
                     </div>
                     <div class="info-card measurement-highlight">
                         <span class="info-label">PEF (อัตราการไหลสูงสุด)</span>
                         <div class="info-value">
-                            <%= record.pef %> <small style="font-size: 14px;">ลิตร/วินาที</small>
+                            <%= record.pef || 'ไม่ระบุ' %> <small style="font-size: 13px;"> ลิตร/วินาที</small>
                         </div>
                     </div>
                 </div>
-
-                <!-- Status and Time in separate grid -->
-                <div class="info-grid" style="margin-top: 20px;">
+                <div class="info-grid">
                     <div class="info-card">
                         <span class="info-label">สถานะการทำงานปอด (FEV1/FVC)</span>
                         <div class="info-value">
-                            <% var statusClass='status-normal' ; var statusText='ปกติ' ; var
-                                ratio=parseFloat(record.fev1Fvc); if (!isNaN(ratio)) { if (ratio < 0.45) {
-                                statusClass='status-danger' ; statusText='การอุดกั้นรุนแรง' ; } else if (ratio < 0.60) {
-                                statusClass='status-danger' ; statusText='การอุดกั้นปานกลาง' ; } else if (ratio < 0.70)
-                                { statusClass='status-warning' ; statusText='การอุดกั้นเล็กน้อย' ; } } else {
-                                statusClass='status-warning' ; statusText='ข้อมูลไม่สมบูรณ์' ; } %>
-                                <span class="status-badge <%= statusClass %>">
-                                    <%= statusText %>
-                                </span>
-                                <% if (!isNaN(ratio)) { %>
-                                    <div style="margin-top: 8px; font-size: 14px; color: #666;">
-                                        อัตราส่วน: <%= ratio.toFixed(2) %>
+                            <% var statusClass='status-normal' ; var statusText='ปกติ' ; var ratio=null; if
+                                (record.fev1Fvc) { ratio=parseFloat(record.fev1Fvc); } else if (record.fev1 &&
+                                record.fvc) { var fev1Val=parseFloat(record.fev1); var fvcVal=parseFloat(record.fvc); if
+                                (!isNaN(fev1Val) && !isNaN(fvcVal) && fvcVal> 0) {
+                                ratio = fev1Val / fvcVal;
+                                }
+                                }
+
+                                if (ratio !== null && !isNaN(ratio)) {
+                                if (ratio < 0.45) { statusClass='status-danger' ; statusText='การอุดกั้นรุนแรง' ; } else
+                                    if (ratio < 0.60) { statusClass='status-danger' ; statusText='การอุดกั้นปานกลาง' ; }
+                                    else if (ratio < 0.70) { statusClass='status-warning' ;
+                                    statusText='การอุดกั้นเล็กน้อย' ; } } else { statusClass='status-warning' ;
+                                    statusText='ข้อมูลไม่สมบูรณ์' ; } %>
+                                    <div>
+                                        <span class="status-badge <%= statusClass %>">
+                                            <%= statusText %>
+                                        </span>
+                                        <% if (ratio !==null && !isNaN(ratio)) { %>
+                                            <div style="margin-top: 6px; font-size: 13px; color: #666;">
+                                                อัตราส่วน: <%= ratio.toFixed(2) %>
+                                            </div>
+                                            <% } %>
                                     </div>
-                                    <% } %>
                         </div>
                     </div>
                     <div class="info-card">
                         <span class="info-label">เวลาที่ทำการวัด</span>
                         <div class="info-value text-large">
-                            <%= new Date(record.measuredAt).toLocaleString('th-TH', { weekday: 'long' , year: 'numeric'
-                                , month: 'long' , day: 'numeric' , hour: '2-digit' , minute: '2-digit' ,
-                                timeZone: 'Asia/Bangkok' }) %>
+                            <% var measureDate=record.measuredAt ? new Date(record.measuredAt) : new Date(); var
+                                formatOptions={ weekday: 'long' , year: 'numeric' , month: 'long' , day: 'numeric' ,
+                                hour: '2-digit' , minute: '2-digit' , timeZone: 'Asia/Bangkok' }; %>
+                                <%= measureDate.toLocaleString('th-TH', formatOptions) %>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Additional Notes Section (if available) -->
-            <% if (record.notes) { %>
+            <div class="section force-page-break-before">
+                <div class="section-header">
+                    <h2>ตารางเปรียบเทียบค่าเฉลี่ยตามเพศและช่วงอายุ</h2>
+                </div>
+                <p>อ้างอิงข้อมูลจาก สมาคมอุรเวชช์แห่งประเทศไทย</p>
+
+                <div class="unbreakable-group">
+                    <h3 class="gender-subtitle">เพศชาย <small
+                            style="font-weight: 400; color: var(--text-secondary);">(อ้างอิงส่วนสูง 170 ซม.)</small>
+                    </h3>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>อายุ (ปี)</th>
+                                <th>FVC (ลิตร)</th>
+                                <th>FEV1 (ลิตร)</th>
+                                <th>PEF (ลิตร/นาที)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>10</td>
+                                <td>3.82</td>
+                                <td>3.49</td>
+                                <td>446.4</td>
+                            </tr>
+                            <tr>
+                                <td>15</td>
+                                <td>4.04</td>
+                                <td>3.58</td>
+                                <td>502.8</td>
+                            </tr>
+                            <tr>
+                                <td>20</td>
+                                <td>4.18</td>
+                                <td>3.6</td>
+                                <td>543</td>
+                            </tr>
+                            <td>25</td>
+                            <td>4.24</td>
+                            <td>3.57</td>
+                            <td>567.6</td>
+                            </tr>
+                            <tr>
+                                <td>30</td>
+                                <td>4.24</td>
+                                <td>3.47</td>
+                                <td>580.2</td>
+                            </tr>
+                            <tr>
+                                <td>35</td>
+                                <td>4.19</td>
+                                <td>3.33</td>
+                                <td>582</td>
+                            </tr>
+                            <tr>
+                                <td>40</td>
+                                <td>4.09</td>
+                                <td>3.18</td>
+                                <td>574.8</td>
+                            </tr>
+                            <tr>
+                                <td>45</td>
+                                <td>3.97</td>
+                                <td>2.96</td>
+                                <td>561</td>
+                            </tr>
+                            <tr>
+                                <td>50</td>
+                                <td>3.82</td>
+                                <td>2.75</td>
+                                <td>541.8</td>
+                            </tr>
+                            <tr>
+                                <td>55</td>
+                                <td>3.67</td>
+                                <td>2.53</td>
+                                <td>520.8</td>
+                            </tr>
+                            <tr>
+                                <td>60</td>
+                                <td>3.52</td>
+                                <td>2.32</td>
+                                <td>498.6</td>
+                            </tr>
+                            <tr>
+                                <td>65</td>
+                                <td>3.39</td>
+                                <td>2.11</td>
+                                <td>477.6</td>
+                            </tr>
+                            <tr>
+                                <td>70</td>
+                                <td>3.28</td>
+                                <td>1.93</td>
+                                <td>459.6</td>
+                            </tr>
+                            <tr>
+                                <td>75</td>
+                                <td>3.21</td>
+                                <td>1.79</td>
+                                <td>447</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="unbreakable-group extra-margin-top">
+                    <h3 class="gender-subtitle">เพศหญิง <small
+                            style="font-weight: 400; color: var(--text-secondary);">(อ้างอิงส่วนสูง 160 ซม.)</small>
+                    </h3>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>อายุ (ปี)</th>
+                                <th>FVC (ลิตร)</th>
+                                <th>FEV1 (ลิตร)</th>
+                                <th>PEF (ลิตร/นาที)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>10</td>
+                                <td>2.82</td>
+                                <td>2.68</td>
+                                <td>355.8</td>
+                            </tr>
+                            <tr>
+                                <td>15</td>
+                                <td>2.98</td>
+                                <td>2.75</td>
+                                <td>372.6</td>
+                            </tr>
+                            <tr>
+                                <td>20</td>
+                                <td>2.88</td>
+                                <td>2.77</td>
+                                <td>383.4</td>
+                            </tr>
+                            <td>25</td>
+                            <td>3.11</td>
+                            <td>2.75</td>
+                            <td>388.2</td>
+                            </tr>
+                            <tr>
+                                <td>30</td>
+                                <td>3.11</td>
+                                <td>2.69</td>
+                                <td>387.6</td>
+                            </tr>
+                            <tr>
+                                <td>35</td>
+                                <td>3.07</td>
+                                <td>2.60</td>
+                                <td>383.4</td>
+                            </tr>
+                            <tr>
+                                <td>40</td>
+                                <td>3.00</td>
+                                <td>2.50</td>
+                                <td>375.6</td>
+                            </tr>
+                            <tr>
+                                <td>45</td>
+                                <td>2.91</td>
+                                <td>2.38</td>
+                                <td>364.8</td>
+                            </tr>
+                            <tr>
+                                <td>50</td>
+                                <td>2.82</td>
+                                <td>2.26</td>
+                                <td>352.8</td>
+                            </tr>
+                            <tr>
+                                <td>55</td>
+                                <td>2.72</td>
+                                <td>2.15</td>
+                                <td>338.4</td>
+                            </tr>
+                            <tr>
+                                <td>60</td>
+                                <td>2.63</td>
+                                <td>2.06</td>
+                                <td>324.0</td>
+                            </tr>
+                            <tr>
+                                <td>65</td>
+                                <td>2.56</td>
+                                <td>1.98</td>
+                                <td>310.2</td>
+                            </tr>
+                            <tr>
+                                <td>70</td>
+                                <td>2.66</td>
+                                <td>1.94</td>
+                                <td>296.4</td>
+                            </tr>
+                            <tr>
+                                <td>75</td>
+                                <td>2.52</td>
+                                <td>1.94</td>
+                                <td>284.4</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <% if (record.notes && record.notes.trim()) { %>
                 <div class="section">
                     <div class="section-header">
                         <div class="section-icon">📝</div>
@@ -485,7 +836,7 @@
                     <div class="info-grid single-column">
                         <div class="info-card">
                             <span class="info-label">บันทึกเพิ่มเติม</span>
-                            <div class="info-value" style="font-size: 16px; line-height: 1.6;">
+                            <div class="info-value" style="font-size: 15px; line-height: 1.6;">
                                 <%= record.notes %>
                             </div>
                         </div>
@@ -493,56 +844,15 @@
                 </div>
                 <% } %>
 
-
         </div>
 
-        <!-- Footer -->
         <div class="footer">
-            <!-- Reference Values Section -->
-            <div
-                style="background: white; padding: 25px 30px; margin-bottom: 20px; border: 1px solid var(--border-light); border-radius: 12px;">
-                <div
-                    style="display: flex; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid var(--border-light);">
-                    <div
-                        style="width: 35px; height: 35px; background: var(--primary-color); border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px; color: white; font-size: 16px;">
-                        📋</div>
-                    <h3 style="font-size: 18px; font-weight: 600; color: var(--text-primary); margin: 0;">ค่าอ้างอิงปกติ
-                    </h3>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 15px;">
-                    <div
-                        style="background: var(--bg-light); padding: 15px; border-radius: 8px; border-left: 3px solid var(--success-color);">
-                        <div
-                            style="font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; text-transform: uppercase;">
-                            SpO2 ปกติ</div>
-                        <div style="font-size: 16px; font-weight: 600; color: var(--text-primary);">95-100%</div>
-                    </div>
-                    <div
-                        style="background: var(--bg-light); padding: 15px; border-radius: 8px; border-left: 3px solid var(--success-color);">
-                        <div
-                            style="font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; text-transform: uppercase;">
-                            FEV1/FVC ปกติ</div>
-                        <div style="font-size: 16px; font-weight: 600; color: var(--text-primary);">> 0.70</div>
-                    </div>
-                </div>
-                <div
-                    style="padding: 12px; background: #f0f8ff; border-left: 4px solid var(--primary-color); border-radius: 0 6px 6px 0;">
-                    <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.4; margin: 0;">
-                        <strong>คำแนะนำ:</strong> ค่าที่วัดได้ควรอยู่ในช่วงปกติ หากผลการตรวจพบความผิดปกติ
-                        ควรปรึกษาแพทย์เพื่อรับการวินิจฉัยและการรักษาที่เหมาะสม
-                    </p>
-                </div>
-            </div>
-
             <div class="footer-content">
-                <div><strong>เอกสารนี้สร้างโดยระบบอัตโนมัติ JR-SMARTBREATH</strong></div>
-                <div style="margin: 8px 0;">🏥 ระบบตรวจสอบสุขภาพปอดอัจฉริยะ</div>
+                <div><strong>เอกสารนี้สร้างโดยระบบอัตโนมัติจาก SMARTBREATH</strong></div>
                 <div class="generation-time">
-                    วันที่สร้างรายงาน: <%= new Date().toLocaleString('th-TH', { year: 'numeric' , month: 'long' ,
-                        day: 'numeric' , hour: '2-digit' , minute: '2-digit' , timeZone: 'Asia/Bangkok' }) %>
-                </div>
-                <div style="margin-top: 10px; font-size: 12px; color: var(--text-muted);">
-                    เอกสารฉบับนี้ได้รับการรับรองทางการแพทย์ตามมาตรฐานสากล
+                    <% var currentDate=new Date(); var generationOptions={ year: 'numeric' , month: 'long' ,
+                        day: 'numeric' , hour: '2-digit' , minute: '2-digit' , timeZone: 'Asia/Bangkok' }; %>
+                        วันที่สร้างรายงาน: <%= currentDate.toLocaleString('th-TH', generationOptions) %>
                 </div>
             </div>
         </div>

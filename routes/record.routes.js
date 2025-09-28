@@ -5,7 +5,7 @@ module.exports = app => {
     const router = require("express").Router();
 
 
-    router.get("/report/:id", [verifyToken], records.downloadReport);
+    router.post("/report/:id", [verifyToken], records.downloadReport);
     router.post("/", records.create);
     router.get("/",[verifyToken], records.findAll);
     router.get("/:id",[verifyToken], records.findOne);

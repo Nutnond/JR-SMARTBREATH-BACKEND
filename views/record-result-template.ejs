@@ -112,7 +112,8 @@
 
         /* START: Style for adding top space */
         .extra-margin-top {
-            padding-top: 40px; /* Changed to padding-top for reliability */
+            padding-top: 40px;
+            /* Changed to padding-top for reliability */
         }
 
         /* END: Style for adding top space */
@@ -141,6 +142,38 @@
             font-weight: 600;
             color: var(--text-primary);
         }
+
+        /* 🎯 NEW STYLE: Patient Info Specific Card */
+        .patient-info-card {
+            background-color: var(--bg-light);
+            border: 1px solid var(--border-light);
+            border-left: 5px solid var(--secondary-color);
+            /* Highlight color */
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-top: 5px;
+            font-size: 13px;
+            page-break-inside: avoid;
+        }
+
+        .patient-info-card div {
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            line-height: 1.4;
+        }
+
+        .patient-info-card strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .patient-info-card span {
+            color: var(--text-secondary);
+        }
+
+        /* 🎯 END NEW STYLE */
+
 
         /* Grid Layout */
         .info-grid {
@@ -218,7 +251,23 @@
             color: white !important;
             font-size: 20px;
             font-weight: 700;
+            /* เพิ่มความชัดเจน */
         }
+
+        /* 🎯 NEW: Style for %Predicted */
+        .percent-predicted {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-top: 5px;
+        }
+
+        .measurement-highlight .percent-predicted {
+            color: rgba(255, 255, 255, 0.9) !important;
+        }
+
+        /* 🎯 END NEW: Style for %Predicted */
+
 
         /* Measurements Grid */
         .measurements-grid {
@@ -268,26 +317,46 @@
             margin-top: 15px;
             font-size: 12px;
             page-break-inside: avoid;
+            border: 1px solid var(--border-light);
+            border-radius: 8px;
+            overflow: hidden;
+            /* สำหรับเก็บ border-radius */
         }
 
         .comparison-table th,
         .comparison-table td {
             padding: 10px 12px;
             text-align: left;
-            border-bottom: 1px solid var(--border-light);
+            border: none;
         }
 
         .comparison-table thead th {
             font-weight: 700;
-            color: var(--text-secondary);
+            color: var(--text-primary);
             background-color: var(--bg-light);
+            border-bottom: 2px solid var(--border-light);
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
+            text-transform: uppercase;
+            font-size: 11px;
+        }
+
+        .comparison-table tbody td {
+            border-bottom: 1px solid var(--border-light);
+            color: var(--text-secondary);
         }
 
         .comparison-table tbody tr:last-child td {
             border-bottom: none;
         }
+
+        .comparison-table .param-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+
+        /* END: Comparison Table Styles */
 
         /* START: Added Style for Gender Subtitle */
         .gender-subtitle {
@@ -415,6 +484,46 @@
         </div>
 
         <div class="content">
+
+            <% if (patientInfo && patientInfo.name) { %>
+            <div class="section">
+                <div class="section-header">
+                    <h2>ข้อมูลผู้รับรายงาน</h2>
+                </div>
+                <div class="patient-info-card">
+                    <div>
+                        <span>ชื่อ-นามสกุล:</span>
+                        <strong>
+                            <%= patientInfo.name %>
+                        </strong>
+                    </div>
+                    <div>
+                        <span>อายุ:</span>
+                        <strong>
+                            <%= patientInfo.age %> ปี
+                        </strong>
+                    </div>
+                    <div>
+                        <span>เพศ:</span>
+                        <strong>
+                            <%= patientInfo.gender || 'ไม่ระบุ' %>
+                        </strong>
+                    </div>
+                    <div>
+                        <span>ส่วนสูง:</span>
+                        <strong>
+                            <%= patientInfo.height %> ซม.
+                        </strong>
+                    </div>
+                    <div>
+                        <span>น้ำหนัก:</span>
+                        <strong>
+                            <%= patientInfo.weight %> กก.
+                        </strong>
+                    </div>
+                </div>
+            </div>
+            <% } %>
             <div class="section">
                 <div class="section-header">
                     <h2>ข้อมูลอุปกรณ์</h2>
@@ -435,7 +544,7 @@
                 </div>
             </div>
 
-            <div class="section">
+            <div class="section force-page-break-before">
                 <div class="section-header">
                     <h2>ผลการวัด</h2>
                 </div>
@@ -450,21 +559,144 @@
                         <span class="info-label">FEV1 (ปริมาณลมหายใจ)</span>
                         <div class="info-value">
                             <%= record.fev1 || 'ไม่ระบุ' %> <small style="font-size: 13px;"> ลิตร</small>
+                            <% const fev1Observed=parseFloat(record.fev1); const fev1Predicted=predicted.FEV1; if
+                                (!isNaN(fev1Observed) && fev1Predicted) { const percent=(fev1Observed / fev1Predicted * 100).toFixed(1); %>
+                            <div class="percent-predicted">
+                                <%= percent %> %Predicted
+                            </div>
+                            <% } %>
                         </div>
                     </div>
                     <div class="info-card measurement-highlight">
                         <span class="info-label">FVC (ความจุปอด)</span>
                         <div class="info-value">
                             <%= record.fvc || 'ไม่ระบุ' %> <small style="font-size: 13px;"> ลิตร</small>
+                            <% const fvcObserved=parseFloat(record.fvc); const fvcPredicted=predicted.FVC; if
+                                (!isNaN(fvcObserved) && fvcPredicted) { const percent=(fvcObserved / fvcPredicted * 100).toFixed(1); %>
+                            <div class="percent-predicted">
+                                <%= percent %> %Predicted
+                            </div>
+                            <% } %>
                         </div>
                     </div>
                     <div class="info-card measurement-highlight">
                         <span class="info-label">PEF (อัตราการไหลสูงสุด)</span>
                         <div class="info-value">
                             <%= record.pef || 'ไม่ระบุ' %> <small style="font-size: 13px;"> ลิตร/วินาที</small>
+                            <% const pefObserved=parseFloat(record.pef); const pefPredicted=predicted.PEF; if
+                                (!isNaN(pefObserved) && pefPredicted) { const percent=(pefObserved / pefPredicted * 100).toFixed(1); %>
+                            <div class="percent-predicted">
+                                <%= percent %> %Predicted
+                            </div>
+                            <% } %>
                         </div>
                     </div>
                 </div>
+
+                <div class="unbreakable-group">
+                    <h3 class="gender-subtitle">การเปรียบเทียบกับค่าคาดการณ์ (Predicted Values)</h3>
+                    <table class="comparison-table">
+                        <thead>
+                            <tr>
+                                <th>พารามิเตอร์</th>
+                                <th>ค่าที่วัดได้ (Observed)</th>
+                                <th>ค่าคาดการณ์ (Predicted)</th>
+                                <th>% คาดการณ์</th>
+                                <th>หน่วย</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% const fev1Obs=parseFloat(record.fev1); const fvcObs=parseFloat(record.fvc); const
+                                pefObs=parseFloat(record.pef); %>
+
+                            <tr>
+                                <td class="param-name">FEV1</td>
+                                <td>
+                                    <%= !isNaN(fev1Obs) ? fev1Obs.toFixed(2) : 'N/A' %>
+                                </td>
+                                <td>
+                                    <%= predicted.FEV1 ? predicted.FEV1.toFixed(2) : 'N/A' %>
+                                </td>
+                                <td>
+                                    <% if (predicted.FEV1 && !isNaN(fev1Obs)) { %>
+                                    <span class="font-bold">
+                                        <%= (fev1Obs / predicted.FEV1 * 100).toFixed(1) %> %
+                                    </span>
+                                    <% } else { %>
+                                    N/A
+                                    <% } %>
+                                </td>
+                                <td>ลิตร</td>
+                            </tr>
+
+                            <tr>
+                                <td class="param-name">FVC</td>
+                                <td>
+                                    <%= !isNaN(fvcObs) ? fvcObs.toFixed(2) : 'N/A' %>
+                                </td>
+                                <td>
+                                    <%= predicted.FVC ? predicted.FVC.toFixed(2) : 'N/A' %>
+                                </td>
+                                <td>
+                                    <% if (predicted.FVC && !isNaN(fvcObs)) { %>
+                                    <span class="font-bold">
+                                        <%= (fvcObs / predicted.FVC * 100).toFixed(1) %> %
+                                    </span>
+                                    <% } else { %>
+                                    N/A
+                                    <% } %>
+                                </td>
+                                <td>ลิตร</td>
+                            </tr>
+
+                            <tr>
+                                <td class="param-name">PEF</td>
+                                <td>
+                                    <%= !isNaN(pefObs) ? pefObs.toFixed(0) : 'N/A' %>
+                                </td>
+                                <td>
+                                    <%= predicted.PEF ? predicted.PEF.toFixed(0) : 'N/A' %>
+                                </td>
+                                <td>
+                                    <% if (predicted.PEF && !isNaN(pefObs)) { %>
+                                    <span class="font-bold">
+                                        <%= (pefObs / predicted.PEF * 100).toFixed(1) %> %
+                                    </span>
+                                    <% } else { %>
+                                    N/A
+                                    <% } %>
+                                </td>
+                                <td>ลิตร/นาที</td>
+                            </tr>
+
+                            <tr>
+                                <td class="param-name">FEV1/FVC Ratio</td>
+                                <td>
+                                    <% const fev1fvcObservedRatio=(fev1Obs / fvcObs); // คำนวณเป็นทศนิยม
+                                        if (!isNaN(fev1fvcObservedRatio) && fvcObs> 0) { %>
+                                        <%= (fev1fvcObservedRatio * 100).toFixed(1) %>
+                                        <% } else { %>
+                                        N/A
+                                        <% } %>
+                                </td>
+                                <td>
+                                    <% // predicted.FEV1_FVC_RATIO ถูกคำนวณมาเป็นเปอร์เซ็นต์ (e.g. 75.3)
+                                        if (predicted.FEV1_FVC_RATIO && !isNaN(predicted.FEV1_FVC_RATIO)) { %>
+                                        <%= predicted.FEV1_FVC_RATIO.toFixed(1) %>
+                                        <% } else { %>
+                                        N/A
+                                        <% } %>
+                                </td>
+                                <td>
+                                    <span style="color: var(--text-muted);">N/A</span>
+                                </td>
+                                <td>%</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+
                 <div class="info-grid">
                     <div class="info-card">
                         <span class="info-label">สถานะการทำงานปอด (FEV1/FVC)</span>
@@ -479,20 +711,20 @@
 
                                 if (ratio !== null && !isNaN(ratio)) {
                                 if (ratio < 0.45) { statusClass='status-danger' ; statusText='การอุดกั้นรุนแรง' ; } else
-                                    if (ratio < 0.60) { statusClass='status-danger' ; statusText='การอุดกั้นปานกลาง' ; }
-                                    else if (ratio < 0.70) { statusClass='status-warning' ;
-                                    statusText='การอุดกั้นเล็กน้อย' ; } } else { statusClass='status-warning' ;
-                                    statusText='ข้อมูลไม่สมบูรณ์' ; } %>
-                                    <div>
-                                        <span class="status-badge <%= statusClass %>">
-                                            <%= statusText %>
-                                        </span>
-                                        <% if (ratio !==null && !isNaN(ratio)) { %>
-                                            <div style="margin-top: 6px; font-size: 13px; color: #666;">
-                                                อัตราส่วน: <%= ratio.toFixed(2) %>
-                                            </div>
-                                            <% } %>
-                                    </div>
+                                if (ratio < 0.60) { statusClass='status-danger' ; statusText='การอุดกั้นปานกลาง' ; }
+                                else if (ratio < 0.70) { statusClass='status-warning' ;
+                                statusText='การอุดกั้นเล็กน้อย' ; } } else { statusClass='status-warning' ;
+                                statusText='ข้อมูลไม่สมบูรณ์' ; } %>
+                            <div>
+                                <span class="status-badge <%= statusClass %>">
+                                    <%= statusText %>
+                                </span>
+                                <% if (ratio !==null && !isNaN(ratio)) { %>
+                                <div style="margin-top: 6px; font-size: 13px; color: var(--text-secondary);">
+                                    อัตราส่วน: **<%= (ratio * 100).toFixed(1) %> %**
+                                </div>
+                                <% } %>
+                            </div>
                         </div>
                     </div>
                     <div class="info-card">
@@ -501,237 +733,26 @@
                             <% var measureDate=record.measuredAt ? new Date(record.measuredAt) : new Date(); var
                                 formatOptions={ weekday: 'long' , year: 'numeric' , month: 'long' , day: 'numeric' ,
                                 hour: '2-digit' , minute: '2-digit' , timeZone: 'Asia/Bangkok' }; %>
-                                <%= measureDate.toLocaleString('th-TH', formatOptions) %>
+                            <%= measureDate.toLocaleString('th-TH', formatOptions) %>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <div class="section force-page-break-before">
-                <div class="section-header">
-                    <h2>ตารางเปรียบเทียบค่าเฉลี่ยตามเพศและช่วงอายุ</h2>
-                </div>
-                <p>อ้างอิงข้อมูลจาก สมาคมอุรเวชช์แห่งประเทศไทย</p>
-
-                <div class="unbreakable-group">
-                    <h3 class="gender-subtitle">เพศชาย <small
-                            style="font-weight: 400; color: var(--text-secondary);">(อ้างอิงส่วนสูง 170 ซม.)</small>
-                    </h3>
-                    <table class="comparison-table">
-                        <thead>
-                            <tr>
-                                <th>อายุ (ปี)</th>
-                                <th>FVC (ลิตร)</th>
-                                <th>FEV1 (ลิตร)</th>
-                                <th>PEF (ลิตร/นาที)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>10</td>
-                                <td>3.82</td>
-                                <td>3.49</td>
-                                <td>446.4</td>
-                            </tr>
-                            <tr>
-                                <td>15</td>
-                                <td>4.04</td>
-                                <td>3.58</td>
-                                <td>502.8</td>
-                            </tr>
-                            <tr>
-                                <td>20</td>
-                                <td>4.18</td>
-                                <td>3.6</td>
-                                <td>543</td>
-                            </tr>
-                            <tr>
-                                <td>25</td>
-                                <td>4.24</td>
-                                <td>3.57</td>
-                                <td>567.6</td>
-                            </tr>
-                            <tr>
-                                <td>30</td>
-                                <td>4.24</td>
-                                <td>3.47</td>
-                                <td>580.2</td>
-                            </tr>
-                            <tr>
-                                <td>35</td>
-                                <td>4.19</td>
-                                <td>3.33</td>
-                                <td>582</td>
-                            </tr>
-                            <tr>
-                                <td>40</td>
-                                <td>4.09</td>
-                                <td>3.18</td>
-                                <td>574.8</td>
-                            </tr>
-                            <tr>
-                                <td>45</td>
-                                <td>3.97</td>
-                                <td>2.96</td>
-                                <td>561</td>
-                            </tr>
-                            <tr>
-                                <td>50</td>
-                                <td>3.82</td>
-                                <td>2.75</td>
-                                <td>541.8</td>
-                            </tr>
-                            <tr>
-                                <td>55</td>
-                                <td>3.67</td>
-                                <td>2.53</td>
-                                <td>520.8</td>
-                            </tr>
-                            <tr>
-                                <td>60</td>
-                                <td>3.52</td>
-                                <td>2.32</td>
-                                <td>498.6</td>
-                            </tr>
-                            <tr>
-                                <td>65</td>
-                                <td>3.39</td>
-                                <td>2.11</td>
-                                <td>477.6</td>
-                            </tr>
-                            <tr>
-                                <td>70</td>
-                                <td>3.28</td>
-                                <td>1.93</td>
-                                <td>459.6</td>
-                            </tr>
-                            <tr>
-                                <td>75</td>
-                                <td>3.21</td>
-                                <td>1.79</td>
-                                <td>447</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="unbreakable-group extra-margin-top">
-                    <h3 class="gender-subtitle">เพศหญิง <small
-                            style="font-weight: 400; color: var(--text-secondary);">(อ้างอิงส่วนสูง 160 ซม.)</small>
-                    </h3>
-                    <table class="comparison-table">
-                        <thead>
-                            <tr>
-                                <th>อายุ (ปี)</th>
-                                <th>FVC (ลิตร)</th>
-                                <th>FEV1 (ลิตร)</th>
-                                <th>PEF (ลิตร/นาที)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>10</td>
-                                <td>2.82</td>
-                                <td>2.68</td>
-                                <td>355.8</td>
-                            </tr>
-                            <tr>
-                                <td>15</td>
-                                <td>2.98</td>
-                                <td>2.75</td>
-                                <td>372.6</td>
-                            </tr>
-                            <tr>
-                                <td>20</td>
-                                <td>2.88</td>
-                                <td>2.77</td>
-                                <td>383.4</td>
-                            </tr>
-                            <tr>
-                                <td>25</td>
-                                <td>3.11</td>
-                                <td>2.75</td>
-                                <td>388.2</td>
-                            </tr>
-                            <tr>
-                                <td>30</td>
-                                <td>3.11</td>
-                                <td>2.69</td>
-                                <td>387.6</td>
-                            </tr>
-                            <tr>
-                                <td>35</td>
-                                <td>3.07</td>
-                                <td>2.60</td>
-                                <td>383.4</td>
-                            </tr>
-                            <tr>
-                                <td>40</td>
-                                <td>3.00</td>
-                                <td>2.50</td>
-                                <td>375.6</td>
-                            </tr>
-                            <tr>
-                                <td>45</td>
-                                <td>2.91</td>
-                                <td>2.38</td>
-                                <td>364.8</td>
-                            </tr>
-                            <tr>
-                                <td>50</td>
-                                <td>2.82</td>
-                                <td>2.26</td>
-                                <td>352.8</td>
-                            </tr>
-                            <tr>
-                                <td>55</td>
-                                <td>2.72</td>
-                                <td>2.15</td>
-                                <td>338.4</td>
-                            </tr>
-                            <tr>
-                                <td>60</td>
-                                <td>2.63</td>
-                                <td>2.06</td>
-                                <td>324.0</td>
-                            </tr>
-                            <tr>
-                                <td>65</td>
-                                <td>2.56</td>
-                                <td>1.98</td>
-                                <td>310.2</td>
-                            </tr>
-                            <tr>
-                                <td>70</td>
-                                <td>2.66</td>
-                                <td>1.94</td>
-                                <td>296.4</td>
-                            </tr>
-                            <tr>
-                                <td>75</td>
-                                <td>2.52</td>
-                                <td>1.94</td>
-                                <td>284.4</td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </div>
             </div>
             <% if (record.notes && record.notes.trim()) { %>
-                <div class="section">
-                    <div class="section-header">
-                        <h2>หมายเหตุเพิ่มเติม</h2>
-                    </div>
-                    <div class="info-grid single-column">
-                        <div class="info-card">
-                            <span class="info-label">บันทึกเพิ่มเติม</span>
-                            <div class="info-value" style="font-size: 15px; line-height: 1.6;">
-                                <%= record.notes %>
-                            </div>
+            <div class="section">
+                <div class="section-header">
+                    <h2>หมายเหตุเพิ่มเติม</h2>
+                </div>
+                <div class="info-grid single-column">
+                    <div class="info-card">
+                        <span class="info-label">บันทึกเพิ่มเติม</span>
+                        <div class="info-value" style="font-size: 15px; line-height: 1.6;">
+                            <%= record.notes %>
                         </div>
                     </div>
                 </div>
-                <% } %>
+            </div>
+            <% } %>
         </div>
 
         <div class="footer">
@@ -740,7 +761,7 @@
                 <div class="generation-time">
                     <% var currentDate=new Date(); var generationOptions={ year: 'numeric' , month: 'long' ,
                         day: 'numeric' , hour: '2-digit' , minute: '2-digit' , timeZone: 'Asia/Bangkok' }; %>
-                        วันที่สร้างรายงาน: <%= currentDate.toLocaleString('th-TH', generationOptions) %>
+                    วันที่สร้างรายงาน: <%= currentDate.toLocaleString('th-TH', generationOptions) %>
                 </div>
             </div>
         </div>
